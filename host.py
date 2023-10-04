@@ -59,10 +59,13 @@ def decrypt(message: bytes):
 
 client_socket, server_socket, privateKey, remoteKey = connSetup()   # Start Connection
 
+change = 0
+path = ""
 # Main Code
 while True:
-    path = client_socket.recv(8192)
-    path = decrypt(path)
+    if change == 0:
+        path = client_socket.recv(8192)
+        path = decrypt(path)
     data = input(f"{color.BLUE}{path} >{color.WHITE} ")
     data = data.split(" ")
     command = data[0]
@@ -82,6 +85,16 @@ while True:
 
     elif command == "cd":
         client_socket.send(crypt(str(data).encode()))
+
+    elif command == "help":
+        print(f''' 
+== {color.RED}SHELL{color.WHITE}
+====================================================
+ls                    List Files              Remote
+pwd                   Print Path              Remote
+cd                    Change Directory        Remote
+clear                 Clear Terminal          Local  \n''')
+        change = 1
 
     elif command == "exit":
         print("Cleaning....")
