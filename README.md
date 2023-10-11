@@ -16,8 +16,8 @@ My own Windows Malware
 
 1. Install dependencies with pip
     
-    `pip install pyinstaller`
+    `pip install -r requirements.txt`
     
-2. Compile .exe
+2. Create .exe
     
     `pyinstaller malware.py -F -m`

