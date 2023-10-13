@@ -7,9 +7,9 @@ My own Windows Malware
 ## Features
 
 - Reverse Shell
-- Screenshot and Screen Recording (WIP)
-- Microphone Recording (WIP)
-- Take Photos and Videos from Camera (WIP)
+- Screenshot and Screen Recording 
+- Microphone Recording 
+- Take Photos and Videos from Camera 
 - Upload and Download Files (WIP)
 
 ## How to Compile
