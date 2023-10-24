@@ -2,3 +2,5 @@ cryptography
 pyinstaller
 tkinter
 vidstream
+mouse
+keyboard
