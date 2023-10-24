@@ -11,6 +11,7 @@ My own Windows Malware
 - Microphone Recording 
 - Take Photos and Videos from Camera 
 - Upload and Download Files (WIP)
+- Keyboard and Mouse Control (WIP)
 
 ## How to Compile
 
